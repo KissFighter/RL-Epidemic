@@ -28,12 +28,13 @@
 ### 类初始化
 
 ```python
-def __init__(self, 
+def __init__(self,
              population: int = 5000,
              initial_infected: int = 10,
              beta: float = 0.3,  # 传播率
              gamma: float = 0.1,  # 康复率
-             max_steps: int = 100):
+             max_steps: int = 100,
+             seed: int = None):  # 随机数种子
 ```
 
 **参数说明：**
@@ -42,11 +43,31 @@ def __init__(self,
 - `beta`: 基础传播率，控制病毒传播速度
 - `gamma`: 康复率，控制感染者康复速度
 - `max_steps`: 最大模拟步数，限制每次疫情模拟的时长
+- `seed`: 随机数种子，用于保证实验结果可复现（新增）
 
 **设计考量：**
 - 适中的人口规模（5000）平衡计算效率和现实性
 - 较短的模拟时长（100步）专注于急性期控制策略
 - 经典SIR参数设置符合流行病学基础理论
+- **随机数种子支持**：保证实验结果可复现，便于算法比较和调试
+
+### 随机数种子功能（新增）
+
+**作用**：
+- 确保环境初始化和动态过程的一致性
+- 使不同训练运行产生相同结果
+- 方便算法性能对比和实验复现
+
+**使用方法**：
+```python
+# 创建可复现的环境
+env = SIREpidemicEnv(population=5000, seed=42)
+
+# 多次运行将产生相同结果
+state1 = env.reset()  # 第一次运行
+state2 = env.reset()  # 第二次运行
+# state1 == state2 （在相同种子下）
+```
 
 ### 状态空间设计
 

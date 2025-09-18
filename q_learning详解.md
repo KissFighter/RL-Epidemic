@@ -42,13 +42,14 @@ def get_target_value(self, state):    # 目标策略的状态价值
 ### 类初始化
 
 ```python
-def __init__(self, 
-             state_size: int, 
+def __init__(self,
+             state_size: int,
              action_size: int,
              learning_rate: float = 0.1,
              discount_factor: float = 0.95,
              epsilon: float = 0.1,  # 固定epsilon - 不衰减
-             state_bins: int = 8):
+             state_bins: int = 8,
+             seed: int = None):     # 随机数种子（新增）
 ```
 
 **关键设计决策：**
@@ -307,14 +308,15 @@ def train_q_learning(episodes: int = 500, max_steps: int = 100):
     """训练Q-learning智能体"""
     
     # 创建环境和智能体
-    env = SIREpidemicEnv(population=5000, max_steps=max_steps)
+    env = SIREpidemicEnv(population=5000, max_steps=max_steps, seed=seed)
     agent = QLearningAgent(
         state_size=env.state_size,
         action_size=env.action_space_size,
         learning_rate=0.1,
         discount_factor=0.95,
         epsilon=0.1,  # 固定epsilon
-        state_bins=8
+        state_bins=8,
+        seed=seed     # 随机数种子（新增）
     )
 ```
 
@@ -474,7 +476,7 @@ from q_learning import QLearningAgent
 from environment import SIREpidemicEnv
 
 # 创建智能体
-agent = QLearningAgent(state_size=3, action_size=3, epsilon=0.1)
+agent = QLearningAgent(state_size=3, action_size=3, epsilon=0.1, seed=42)
 
 # 分析特定状态
 state = np.array([0.7, 0.2, 0.1])  # 疫情中期状态

@@ -28,13 +28,14 @@ class QLearningAgent:
     - Target Policy: greedy (for Q-value updates)
     """
     
-    def __init__(self, 
-                 state_size: int, 
+    def __init__(self,
+                 state_size: int,
                  action_size: int,
                  learning_rate: float = 0.1,
                  discount_factor: float = 0.95,
                  epsilon: float = 0.1,  # Fixed epsilon - no decay
-                 state_bins: int = 8):
+                 state_bins: int = 8,
+                 seed: int = None):
         """
         Initialize Q-learning agent.
         
@@ -48,6 +49,11 @@ class QLearningAgent:
         """
         self.state_size = state_size
         self.action_size = action_size
+        self.seed = seed
+
+        # Set random seed if provided
+        if seed is not None:
+            np.random.seed(seed)
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
         self.epsilon = epsilon  # Fixed value
@@ -241,28 +247,34 @@ class QLearningAgent:
         print(f"Model loaded from {filepath}")
 
 
-def train_q_learning(episodes: int = 500, max_steps: int = 100):
+def train_q_learning(episodes: int = 500, max_steps: int = 100, seed: int = 42):
     """
     Train Q-learning agent on epidemic control task.
-    
+
     Args:
         episodes: Number of training episodes
         max_steps: Maximum steps per episode
-        
+        seed: Random seed for reproducibility
+
     Returns:
         Trained agent and environment
     """
     print("=== Q-Learning Training (Off-Policy) ===")
-    
-    # Create environment and agent
-    env = SIREpidemicEnv(population=5000, max_steps=max_steps)
+    print(f"Using random seed: {seed}")
+
+    # Set global random seed
+    np.random.seed(seed)
+
+    # Create environment and agent with seeds
+    env = SIREpidemicEnv(population=5000, max_steps=max_steps, seed=seed)
     agent = QLearningAgent(
         state_size=env.state_size,
         action_size=env.action_space_size,
         learning_rate=0.1,
         discount_factor=0.95,
         epsilon=0.1,  # Fixed epsilon
-        state_bins=8
+        state_bins=8,
+        seed=seed
     )
     
     # Training history
@@ -334,15 +346,20 @@ def train_q_learning(episodes: int = 500, max_steps: int = 100):
     return agent, env
 
 
-def test_q_learning():
+def test_q_learning(seed: int = 42):
     """Test trained Q-learning agent."""
     print("\n=== Testing Q-Learning Agent ===")
-    
-    # Create environment and agent
-    env = SIREpidemicEnv(population=5000, max_steps=100)
+    print(f"Using random seed: {seed}")
+
+    # Set global random seed
+    np.random.seed(seed)
+
+    # Create environment and agent with seeds
+    env = SIREpidemicEnv(population=5000, max_steps=100, seed=seed)
     agent = QLearningAgent(
         state_size=env.state_size,
-        action_size=env.action_space_size
+        action_size=env.action_space_size,
+        seed=seed
     )
     
     try:
@@ -392,11 +409,15 @@ def test_q_learning():
 
 
 if __name__ == "__main__":
+    # Set main random seed
+    MAIN_SEED = 42
+    np.random.seed(MAIN_SEED)
+
     # Train the agent
-    agent, env = train_q_learning(episodes=500, max_steps=100)
-    
+    agent, env = train_q_learning(episodes=500, max_steps=100, seed=MAIN_SEED)
+
     # Test the trained agent
-    test_q_learning()
+    test_q_learning(seed=MAIN_SEED)
     
     print(f"\nQ-Learning (Off-Policy) Summary:")
     print(f"- Behavior Policy: ε-greedy (ε={agent.epsilon})")

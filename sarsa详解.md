@@ -42,13 +42,14 @@ target = reward + γ * Q[next_state][next_action]  # 用实际要执行的动作
 ### 类初始化
 
 ```python
-def __init__(self, 
-             state_size: int, 
+def __init__(self,
+             state_size: int,
              action_size: int,
              learning_rate: float = 0.1,
              discount_factor: float = 0.95,
              epsilon: float = 0.1,  # 固定epsilon - 不衰减
-             state_bins: int = 8):
+             state_bins: int = 8,
+             seed: int = None):     # 随机数种子（新增）
 ```
 
 **参数设计理念：**
@@ -182,7 +183,7 @@ q_learning_next_value = max(Q(s',a)) = Q(s',1)
 ### 训练循环的特殊结构
 
 ```python
-def train_sarsa(episodes: int = 500, max_steps: int = 100):
+def train_sarsa(episodes: int = 500, max_steps: int = 100, seed: int = 42):
     for episode in range(episodes):
         state = env.reset()
         

@@ -26,24 +26,36 @@ pip install numpy matplotlib scipy
 ### Key Development Commands
 
 ```bash
-# Main training script - simplified epidemic control
-python simple_train.py
+# Q-Learning training (with reproducible seed)
+python q_learning.py
 
-# Test trained model (run after training)
-python -c "
-from simple_train import test_trained_model
-test_trained_model()
-"
+# SARSA training (with reproducible seed)
+python sarsa.py
+
+# Inverse Reinforcement Learning (IRL)
+python inverse_rl.py
+
+# All training now uses fixed random seeds for reproducibility
+# Default seed: 42 for consistency across runs
 ```
 
 ### Model Management
 ```bash
-# Trained models are saved as .pkl files in training_results/
+# Q-Learning models
+results/q_learning_model.pkl
+
+# SARSA models
+results/sarsa_model.pkl
+
+# IRL models
+training_results/irl_model.pkl
+
+# All models include seed information for reproducibility
 # Load a model programmatically:
-# agent.load_model('training_results/simple_q_model.pkl')
+# agent.load_model('results/q_learning_model.pkl')
 
 # View training outputs
-ls training_results/
+ls results/ training_results/
 ```
 
 ## Architecture Overview
@@ -100,11 +112,18 @@ The current simplified implementation uses **model-free Q-learning** for educati
 ### Training and Evaluation Workflow
 
 #### Current Simplified Workflow:
-1. **Environment Initialization**: Set population size (5000), disease parameters (beta=0.3, gamma=0.1), episode length (100 steps)
-2. **Agent Configuration**: Set learning rate (0.1), exploration schedule (epsilon decay), state discretization (8 bins)  
-3. **Training Loop**: Episode execution → Q-learning updates → periodic progress reporting → model saving
+1. **Environment Initialization**: Set population size (5000), disease parameters (beta=0.3, gamma=0.1), episode length (100 steps), **random seed**
+2. **Agent Configuration**: Set learning rate (0.1), exploration schedule (epsilon=0.1 fixed), state discretization (8 bins), **random seed**
+3. **Training Loop**: Episode execution → Q-learning/SARSA updates → periodic progress reporting → model saving
 4. **Policy Extraction**: Trained Q-table provides state→action policy mapping
 5. **Testing & Visualization**: Test trained model, generate epidemic curves and action sequences
+6. **IRL Training**: Learn reward weights from expert demonstrations using Maximum Margin IRL
+
+#### Reproducibility Features:
+- **Fixed Random Seeds**: All components (environment, agents, IRL) use configurable seeds (default: 42)
+- **Deterministic Training**: Same seed produces identical results across runs
+- **Seed Storage**: Seeds saved in model metadata for experiment reproducibility
+- **Consistent Evaluation**: Test runs use same seeds as training for fair comparison
 
 ### Performance Considerations
 
@@ -112,7 +131,9 @@ The current simplified implementation uses **model-free Q-learning** for educati
 - Training time scales with state space size (state_bins^3 for 3D state = 8^3 = 512 states)
 - Lower memory usage due to simplified state space
 - Faster training due to reduced complexity
-- Default 300 episodes provides good convergence
+- Default 500 episodes provides good convergence
+- **Reproducible Results**: Fixed seeds ensure identical outcomes across runs
+- **Multiple Algorithms**: Q-Learning (off-policy), SARSA (on-policy), IRL (inverse learning)
 
 **Optimization Tips:**
 - Adjust state_bins (default 8) to balance memory vs. learning quality
@@ -133,3 +154,32 @@ The current simplified implementation uses **model-free Q-learning** for educati
 - 2: Full isolation (β reduced to 10%, 50% economic cost)
 
 The reward function balances infection penalty (based on infected population) and economic penalty (based on isolation level).
+
+### Random Seed Usage
+
+**Reproducibility Features**:
+- **Environment**: `SIREpidemicEnv(seed=42)` - Controls episode initialization and dynamics
+- **Q-Learning**: `QLearningAgent(seed=42)` - Controls ε-greedy action selection
+- **SARSA**: `SARSAAgent(seed=42)` - Controls ε-greedy policy behavior
+- **IRL**: `MaxMarginIRL(seed=42)` - Controls demonstration generation and optimization
+
+**Usage Examples**:
+```python
+# Q-Learning with reproducible seed
+agent, env = train_q_learning(episodes=500, seed=42)
+
+# SARSA with reproducible seed
+agent, env = train_sarsa(episodes=500, seed=42)
+
+# IRL with reproducible seed
+irl = train_irl_from_expert('results/q_learning_model.pkl', seed=42)
+
+# Load and analyze IRL results
+loaded_irl = load_and_analyze_irl('training_results/irl_model.pkl')
+```
+
+**Seed Management**:
+- Default seeds: Q-Learning/SARSA (42), IRL (42), Testing (42)
+- Seeds saved in model metadata for experiment reproduction
+- Consistent seeding across environment, agent, and IRL components
+- All random operations (action selection, episode initialization) are deterministic

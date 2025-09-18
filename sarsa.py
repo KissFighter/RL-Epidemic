@@ -28,13 +28,14 @@ class SARSAAgent:
     - Value estimation in learning updates
     """
     
-    def __init__(self, 
-                 state_size: int, 
+    def __init__(self,
+                 state_size: int,
                  action_size: int,
                  learning_rate: float = 0.1,
                  discount_factor: float = 0.95,
                  epsilon: float = 0.1,  # Fixed epsilon - no decay
-                 state_bins: int = 8):
+                 state_bins: int = 8,
+                 seed: int = None):
         """
         Initialize SARSA agent.
         
@@ -48,6 +49,11 @@ class SARSAAgent:
         """
         self.state_size = state_size
         self.action_size = action_size
+        self.seed = seed
+
+        # Set random seed if provided
+        if seed is not None:
+            np.random.seed(seed)
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
         self.epsilon = epsilon  # Fixed value
@@ -207,7 +213,7 @@ class SARSAAgent:
         print(f"Model loaded from {filepath}")
 
 
-def train_sarsa(episodes: int = 500, max_steps: int = 100):
+def train_sarsa(episodes: int = 500, max_steps: int = 100, seed: int = 42):
     """
     Train SARSA agent on epidemic control task.
     
@@ -219,16 +225,21 @@ def train_sarsa(episodes: int = 500, max_steps: int = 100):
         Trained agent and environment
     """
     print("=== SARSA Training (On-Policy) ===")
-    
-    # Create environment and agent
-    env = SIREpidemicEnv(population=5000, max_steps=max_steps)
+    print(f"Using random seed: {seed}")
+
+    # Set global random seed
+    np.random.seed(seed)
+
+    # Create environment and agent with seeds
+    env = SIREpidemicEnv(population=5000, max_steps=max_steps, seed=seed)
     agent = SARSAAgent(
         state_size=env.state_size,
         action_size=env.action_space_size,
         learning_rate=0.1,
         discount_factor=0.95,
         epsilon=0.1,  # Fixed epsilon
-        state_bins=8
+        state_bins=8,
+        seed=seed
     )
     
     # Training history
@@ -308,15 +319,20 @@ def train_sarsa(episodes: int = 500, max_steps: int = 100):
     return agent, env
 
 
-def test_sarsa():
+def test_sarsa(seed: int = 42):
     """Test trained SARSA agent."""
     print("\n=== Testing SARSA Agent ===")
-    
-    # Create environment and agent
-    env = SIREpidemicEnv(population=5000, max_steps=100)
+    print(f"Using random seed: {seed}")
+
+    # Set global random seed
+    np.random.seed(seed)
+
+    # Create environment and agent with seeds
+    env = SIREpidemicEnv(population=5000, max_steps=100, seed=seed)
     agent = SARSAAgent(
         state_size=env.state_size,
-        action_size=env.action_space_size
+        action_size=env.action_space_size,
+        seed=seed
     )
     
     try:
@@ -412,12 +428,16 @@ def compare_with_greedy_policy():
 
 
 if __name__ == "__main__":
+    # Set main random seed
+    MAIN_SEED = 42
+    np.random.seed(MAIN_SEED)
+
     # Train the agent
-    agent, env = train_sarsa(episodes=500, max_steps=100)
-    
+    agent, env = train_sarsa(episodes=500, max_steps=100, seed=MAIN_SEED)
+
     # Test the trained agent
-    test_sarsa()
-    
+    test_sarsa(seed=MAIN_SEED)
+
     # Compare policies
     compare_with_greedy_policy()
     

@@ -23,12 +23,13 @@ class SIREpidemicEnv:
     SIR model with controllable intervention measures.
     """
     
-    def __init__(self, 
+    def __init__(self,
                  population: int = 5000,
                  initial_infected: int = 10,
                  beta: float = 0.3,  # transmission rate
                  gamma: float = 0.1,  # recovery rate
-                 max_steps: int = 100):
+                 max_steps: int = 100,
+                 seed: int = None):
         """
         Initialize the SIR epidemic environment.
         
@@ -44,7 +45,12 @@ class SIREpidemicEnv:
         self.beta = beta
         self.gamma = gamma
         self.max_steps = max_steps
-        
+        self.seed = seed
+
+        # Set random seed if provided
+        if seed is not None:
+            np.random.seed(seed)
+
         # Action space: 3 isolation levels
         self.action_space_size = 3
         
