@@ -4,12 +4,13 @@ This project compares **off-policy Q-learning** and **on-policy SARSA** algorith
 
 ## Project Overview
 
-The project consists of four core Python files:
+The project consists of five core Python files:
 
 - **`environment.py`**: SIR epidemic environment implementation
 - **`q_learning.py`**: Q-learning algorithm (off-policy) with fixed epsilon
 - **`sarsa.py`**: SARSA algorithm (on-policy) with fixed epsilon
 - **`inverse_rl.py`**: Inverse Reinforcement Learning using Maximum Margin IRL
+- **`run_irl_experiment.py`**: Complete IRL experiment runner with easy interface
 
 ## Key Features
 
@@ -67,7 +68,21 @@ from sarsa import train_sarsa
 agent, env = train_sarsa(episodes=500, max_steps=100, seed=42)
 ```
 
-### 4. Test Trained Models
+### 4. Run Complete IRL Experiment (Recommended)
+```bash
+# One-command complete experiment: IRL learning + retraining + comparison + visualization
+python run_irl_experiment.py
+```
+
+**This will generate:**
+- IRL learned reward weights
+- Retrained Q-learning and SARSA agents with IRL weights
+- **Side-by-side comparison plots** showing:
+  - Original vs IRL-retrained epidemic curves
+  - Original vs IRL-retrained action sequences
+  - Performance metrics comparison
+
+### 5. Test Individual Models
 ```python
 from q_learning import test_q_learning
 from sarsa import test_sarsa
@@ -77,8 +92,8 @@ from inverse_rl import train_irl_from_expert
 test_q_learning(seed=42)
 test_sarsa(seed=42)
 
-# Train and test Inverse RL
-irl = train_irl_from_expert('results/q_learning_model.pkl', seed=42)
+# Train Inverse RL manually
+irl = train_irl_from_expert('models/original/q_learning.pkl', seed=42)
 ```
 
 ## Core Components
@@ -139,6 +154,22 @@ irl = train_irl_from_expert('results/q_learning_model.pkl', seed=42)
 - Lightweight numerical diagnostics (no plotting)
 - Complete save/load functionality with metadata
 - Reproducible results with seed management
+
+### IRL Experiment Runner (`run_irl_experiment.py`)
+
+**Complete IRL Pipeline:**
+- **One-Command Execution**: Run entire IRL experiment with single command
+- **Automatic Model Detection**: Checks for required trained models
+- **Progress Reporting**: Clear status updates throughout execution
+- **Multiple Modes**: Complete run, step-by-step, or results-only display
+
+**Usage Options:**
+```bash
+python run_irl_experiment.py        # Complete experiment
+python run_irl_experiment.py step   # Step-by-step execution
+python run_irl_experiment.py results # Show existing results
+python run_irl_experiment.py help   # Show help
+```
 
 ## Algorithm Comparison
 

@@ -396,7 +396,7 @@ def test_sarsa():
     """测试训练好的SARSA智能体"""
     
     # 加载模型
-    agent.load_model('results/sarsa_model.pkl')
+    agent.load_model('models/original/sarsa.pkl')
     
     # 测试时仍使用ε-贪婪策略
     # 注意：这与Q-learning不同，Q-learning测试时用贪婪策略
@@ -415,7 +415,7 @@ def compare_with_greedy_policy():
     """比较ε-贪婪策略和纯贪婪策略"""
     
     # 加载SARSA模型
-    agent.load_model('results/sarsa_model.pkl')
+    agent.load_model('models/original/sarsa.pkl')
     
     # 测试1：使用学习的ε-贪婪策略
     print("测试ε-贪婪策略（ε=0.1）...")
@@ -470,6 +470,50 @@ Q-Learning Performance:
 # - Q-learning测试性能更好（学习最优策略）
 # - SARSA训练测试差异更小（策略一致）
 # - SARSA更稳定（不受探索噪声影响）
+```
+
+## 使用示例
+
+### 基本训练
+```python
+from sarsa import train_sarsa, test_sarsa
+
+# 训练智能体（可复现）
+agent, env = train_sarsa(episodes=500, max_steps=100, seed=42)
+
+# 测试智能体
+test_sarsa(seed=42)
+```
+
+### 完整IRL实验（推荐）
+```bash
+# 一键运行完整实验：SARSA训练 + IRL学习 + 可视化对比
+python run_irl_experiment.py
+```
+
+**自动生成的可视化对比图：**
+- `outputs/plots/sarsa_policy_comparison.png`
+  - 原始SARSA策略 vs IRL重训练策略
+  - 疫情曲线对比 + 动作序列对比
+  - 性能指标改进百分比
+- 展示SARSA与Q-learning对IRL权重的不同适应性
+
+### 策略对比分析
+```python
+from sarsa import SARSAAgent
+from environment import SIREpidemicEnv
+
+# 创建智能体
+agent = SARSAAgent(state_size=3, action_size=3, epsilon=0.1, seed=42)
+
+# 分析特定状态
+state = np.array([0.7, 0.2, 0.1])  # 疫情中期状态
+policy_info = agent.get_policy_info(state)
+
+print("SARSA策略分析:")
+print(f"Q值: {policy_info['q_values']}")
+print(f"最佳动作: {policy_info['best_action']}")
+print(f"策略概率: {policy_info['policy_probabilities']}")
 ```
 
 ## 使用场景和建议

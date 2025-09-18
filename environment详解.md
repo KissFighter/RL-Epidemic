@@ -304,8 +304,8 @@ def get_statistics(self) -> Dict[str, float]:
 ```python
 from environment import SIREpidemicEnv
 
-# 创建环境
-env = SIREpidemicEnv(population=5000, max_steps=100)
+# 创建可复现的环境（新增seed参数）
+env = SIREpidemicEnv(population=5000, max_steps=100, seed=42)
 
 # 重置环境
 state = env.reset()
@@ -320,14 +320,31 @@ for step in range(10):
     if done:
         break
 
-# 可视化结果
-env.render(save_path="epidemic_test.png")
+# 可视化结果（保存到新的目录结构）
+env.render(save_path="outputs/plots/epidemic_test.png")
 
 # 获取统计信息
 stats = env.get_statistics()
 print(f"感染峰值: {stats['peak_infections']:.0f}")
 print(f"攻击率: {stats['attack_rate']:.1%}")
 ```
+
+### 完整IRL实验（推荐）
+```bash
+# 一键运行完整IRL实验并生成可视化对比
+python run_irl_experiment.py
+
+# 这将生成：
+# - models/irl/weights.pkl - IRL学习的权重
+# - outputs/plots/q_learning_policy_comparison.png - Q-learning策略对比图
+# - outputs/plots/sarsa_policy_comparison.png - SARSA策略对比图
+```
+
+**可视化对比内容：**
+- 左上：原始策略的疫情曲线 (S, I, R)
+- 右上：IRL重训练策略的疫情曲线
+- 左下：原始策略的动作序列
+- 右下：IRL重训练策略的动作序列
 
 ### 参数实验
 ```python
@@ -343,16 +360,17 @@ for config in configs:
     env = SIREpidemicEnv(
         population=5000,
         beta=config['beta'],
-        gamma=config['gamma']
+        gamma=config['gamma'],
+        seed=42  # 添加seed确保可复现
     )
-    
+
     # 运行无干预基线
     state = env.reset()
     for step in range(100):
         state, reward, done, info = env.step(0)  # 无隔离
         if done:
             break
-    
+
     stats = env.get_statistics()
     print(f"{config['name']}: 攻击率 {stats['attack_rate']:.1%}")
 ```

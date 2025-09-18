@@ -318,8 +318,8 @@ def train_q_learning(episodes: int = 500, max_steps: int = 100, seed: int = 42):
                   f"Avg Steps = {avg_steps:4.1f}")
     
     # Save trained model
-    os.makedirs('results', exist_ok=True)
-    agent.save_model('results/q_learning_model.pkl')
+    os.makedirs('models/original', exist_ok=True)
+    agent.save_model('models/original/q_learning.pkl')
     
     # Plot training curves
     plt.figure(figsize=(12, 4))
@@ -339,7 +339,9 @@ def train_q_learning(episodes: int = 500, max_steps: int = 100, seed: int = 42):
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('results/q_learning_training.png', dpi=300, bbox_inches='tight')
+    # Save training plots
+    os.makedirs('outputs/plots', exist_ok=True)
+    plt.savefig('outputs/plots/q_learning_training.png', dpi=300, bbox_inches='tight')
     plt.show()
     
     print("\nTraining completed!")
@@ -364,7 +366,7 @@ def test_q_learning(seed: int = 42):
     
     try:
         # Load trained model
-        agent.load_model('results/q_learning_model.pkl')
+        agent.load_model('models/original/q_learning.pkl')
         
         # Test episode using target policy (greedy)
         state = env.reset()
@@ -396,7 +398,7 @@ def test_q_learning(seed: int = 42):
         print(f"  Actions taken: {actions[:10]}..." if len(actions) > 10 else f"  Actions taken: {actions}")
         
         # Visualize results
-        env.render(save_path='results/q_learning_test.png')
+        env.render(save_path='outputs/plots/q_learning_test.png')
         
         # Print statistics
         stats = env.get_statistics()

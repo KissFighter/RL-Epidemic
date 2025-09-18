@@ -291,8 +291,8 @@ def train_sarsa(episodes: int = 500, max_steps: int = 100, seed: int = 42):
                   f"Avg Steps = {avg_steps:4.1f}")
     
     # Save trained model
-    os.makedirs('results', exist_ok=True)
-    agent.save_model('results/sarsa_model.pkl')
+    os.makedirs('models/original', exist_ok=True)
+    agent.save_model('models/original/sarsa.pkl')
     
     # Plot training curves
     plt.figure(figsize=(12, 4))
@@ -312,7 +312,9 @@ def train_sarsa(episodes: int = 500, max_steps: int = 100, seed: int = 42):
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('results/sarsa_training.png', dpi=300, bbox_inches='tight')
+    # Save training plots
+    os.makedirs('outputs/plots', exist_ok=True)
+    plt.savefig('outputs/plots/sarsa_training.png', dpi=300, bbox_inches='tight')
     plt.show()
     
     print("\nTraining completed!")
@@ -337,7 +339,7 @@ def test_sarsa(seed: int = 42):
     
     try:
         # Load trained model
-        agent.load_model('results/sarsa_model.pkl')
+        agent.load_model('models/original/sarsa.pkl')
         
         # Test episode using the learned policy
         state = env.reset()
@@ -369,7 +371,7 @@ def test_sarsa(seed: int = 42):
         print(f"  Actions taken: {actions[:10]}..." if len(actions) > 10 else f"  Actions taken: {actions}")
         
         # Visualize results
-        env.render(save_path='results/sarsa_test.png')
+        env.render(save_path='outputs/plots/sarsa_test.png')
         
         # Print statistics
         stats = env.get_statistics()
@@ -389,7 +391,7 @@ def compare_with_greedy_policy():
         # Load trained model
         env = SIREpidemicEnv(population=5000, max_steps=100)
         agent = SARSAAgent(state_size=env.state_size, action_size=env.action_space_size)
-        agent.load_model('results/sarsa_model.pkl')
+        agent.load_model('models/original/sarsa.pkl')
         
         # Test with epsilon-greedy (learned policy)
         print("Testing with epsilon-greedy policy (ε=0.1)...")

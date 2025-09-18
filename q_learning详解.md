@@ -375,7 +375,7 @@ def test_q_learning():
     """测试训练好的Q-learning智能体"""
     
     # 加载训练好的模型
-    agent.load_model('results/q_learning_model.pkl')
+    agent.load_model('models/original/q_learning.pkl')
     
     # 测试时使用目标策略（纯贪婪）
     for step in range(100):
@@ -463,12 +463,24 @@ Q(s,a) ← Q(s,a) + α[r + γ Q(s',a') - Q(s,a)]
 ```python
 from q_learning import train_q_learning, test_q_learning
 
-# 训练智能体
-agent, env = train_q_learning(episodes=500, max_steps=100)
+# 训练智能体（可复现）
+agent, env = train_q_learning(episodes=500, max_steps=100, seed=42)
 
 # 测试智能体
-test_q_learning()
+test_q_learning(seed=42)
 ```
+
+### 完整IRL实验（推荐）
+```bash
+# 一键运行完整实验：Q-learning训练 + IRL学习 + 可视化对比
+python run_irl_experiment.py
+```
+
+**自动生成的可视化对比图：**
+- `outputs/plots/q_learning_policy_comparison.png`
+  - 原始Q-learning策略 vs IRL重训练策略
+  - 疫情曲线对比 + 动作序列对比
+  - 性能指标改进百分比
 
 ### 策略分析
 ```python

@@ -26,14 +26,18 @@ pip install numpy matplotlib scipy
 ### Key Development Commands
 
 ```bash
-# Q-Learning training (with reproducible seed)
-python q_learning.py
+# Complete IRL Experiment with Visualization (Recommended)
+python run_irl_experiment.py
 
-# SARSA training (with reproducible seed)
-python sarsa.py
+# Individual algorithm training
+python q_learning.py   # Q-Learning training (with reproducible seed)
+python sarsa.py        # SARSA training (with reproducible seed)
+python inverse_rl.py   # Inverse Reinforcement Learning (IRL)
 
-# Inverse Reinforcement Learning (IRL)
-python inverse_rl.py
+# Experiment modes:
+python run_irl_experiment.py        # Full experiment + visualization
+python run_irl_experiment.py step   # Step-by-step execution
+python run_irl_experiment.py results # Show existing results only
 
 # All training now uses fixed random seeds for reproducibility
 # Default seed: 42 for consistency across runs
@@ -41,21 +45,31 @@ python inverse_rl.py
 
 ### Model Management
 ```bash
-# Q-Learning models
-results/q_learning_model.pkl
+# Original trained models
+models/original/q_learning.pkl
+models/original/sarsa.pkl
 
-# SARSA models
-results/sarsa_model.pkl
+# IRL learned weights
+models/irl/weights.pkl
+models/irl/test.pkl
 
-# IRL models
-training_results/irl_model.pkl
+# IRL-retrained models
+models/irl_trained/q_learning_with_irl.pkl
+models/irl_trained/sarsa_with_irl.pkl
+
+# Training outputs and plots
+outputs/plots/q_learning_training.png          # Q-learning training curves
+outputs/plots/sarsa_training.png               # SARSA training curves
+outputs/plots/q_learning_policy_comparison.png # Q-learning policy comparison
+outputs/plots/sarsa_policy_comparison.png      # SARSA policy comparison
+outputs/logs/                                  # Training logs
 
 # All models include seed information for reproducibility
 # Load a model programmatically:
-# agent.load_model('results/q_learning_model.pkl')
+# agent.load_model('models/original/q_learning.pkl')
 
-# View training outputs
-ls results/ training_results/
+# View all outputs
+ls models/ outputs/
 ```
 
 ## Architecture Overview
@@ -118,6 +132,7 @@ The current simplified implementation uses **model-free Q-learning** for educati
 4. **Policy Extraction**: Trained Q-table provides state→action policy mapping
 5. **Testing & Visualization**: Test trained model, generate epidemic curves and action sequences
 6. **IRL Training**: Learn reward weights from expert demonstrations using Maximum Margin IRL
+7. **Policy Comparison & Visualization**: Generate side-by-side comparison plots showing original vs IRL-retrained policies
 
 #### Reproducibility Features:
 - **Fixed Random Seeds**: All components (environment, agents, IRL) use configurable seeds (default: 42)
@@ -172,10 +187,10 @@ agent, env = train_q_learning(episodes=500, seed=42)
 agent, env = train_sarsa(episodes=500, seed=42)
 
 # IRL with reproducible seed
-irl = train_irl_from_expert('results/q_learning_model.pkl', seed=42)
+irl = train_irl_from_expert('models/original/q_learning.pkl', seed=42)
 
 # Load and analyze IRL results
-loaded_irl = load_and_analyze_irl('training_results/irl_model.pkl')
+loaded_irl = load_and_analyze_irl('models/irl/weights.pkl')
 ```
 
 **Seed Management**:
@@ -183,3 +198,4 @@ loaded_irl = load_and_analyze_irl('training_results/irl_model.pkl')
 - Seeds saved in model metadata for experiment reproduction
 - Consistent seeding across environment, agent, and IRL components
 - All random operations (action selection, episode initialization) are deterministic
+- 每次修改代码之后，更新所有md文件
