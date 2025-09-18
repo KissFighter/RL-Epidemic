@@ -29,7 +29,6 @@ class MaxMarginIRL:
 
         # Set random seeds for reproducibility
         np.random.seed(seed)
-        self.env.seed(seed) if hasattr(self.env, 'seed') else None
 
         # Training history and diagnostics
         self.mu_E = None  # Expert feature expectations
@@ -297,7 +296,7 @@ class MaxMarginIRL:
 
 
 
-def train_irl_from_expert(expert_model_path='training_results/simple_q_model.pkl', save_path='training_results/irl_model.pkl', seed=42):
+def train_irl_from_expert(expert_model_path='results/q_learning_model.pkl', save_path='training_results/irl_model.pkl', seed=42):
     """Train IRL from expert Q-learning policy with diagnostics."""
     # Set global seed for reproducibility
     np.random.seed(seed)
@@ -379,7 +378,7 @@ if __name__ == "__main__":
     test_irl = test_irl_basic(seed=MAIN_SEED + 1)
 
     # Train from expert if available
-    expert_model_path = 'training_results/simple_q_model.pkl'
+    expert_model_path = 'results/q_learning_model.pkl'
     if os.path.exists(expert_model_path):
         print("\n2. Training IRL from expert policy...")
         irl = train_irl_from_expert(expert_model_path, seed=MAIN_SEED)
@@ -391,11 +390,11 @@ if __name__ == "__main__":
 
     else:
         print(f"\nExpert model not found at {expert_model_path}")
-        print("Run training first: python simple_train.py")
+        print("Run training first: python q_learning.py")
         print("\nExample of loading a saved model:")
         print("irl = load_and_analyze_irl('training_results/irl_model.pkl')")
 
 # Example usage with specific seeds:
-# irl = train_irl_from_expert('training_results/simple_q_model.pkl', seed=42)
+# irl = train_irl_from_expert('results/q_learning_model.pkl', seed=42)
 # test_irl = test_irl_basic(seed=123)
 # loaded_irl = load_and_analyze_irl('training_results/irl_model.pkl')
